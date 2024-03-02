@@ -1,11 +1,14 @@
 import { Client, Events, GatewayIntentBits, Collection, ClientOptions, Interaction } from 'discord.js';
+
 import config from './config.js';
-import colors from 'colors';
 import { IExtendedClient, ISlashCommand } from './types/types.js';
-import deployCommands from './utility/deploy-commands.js';
+
+import deployCommands from './utility/deployCommands.js';
 import getCommandsFiles from './utility/getCommandsFiles.js';
 
-colors.enable();
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 const clientOptions: ClientOptions = {
   intents: [GatewayIntentBits.Guilds]
@@ -20,33 +23,20 @@ await getCommandsFiles((command: ISlashCommand) => {
 
 await deployCommands();
 
-//Launching the bot
-client.once(Events.ClientReady, (readyClient: Client<true>) => {
-  console.log(`Ready! Logged in as ${readyClient.user?.tag}`.yellow.bold);
-});
+// Event handling
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath);
+
+for (const file of eventFiles) {
+  const filePath = `./events/${file}`;
+  const { default: event } = await import(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
+  }
+}
 
 client.login(config.botToken);
-
-//Command handling
-client.on(Events.InteractionCreate, async (interaction: Interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-
-  const extendedClient = interaction.client as IExtendedClient;
-  const command = extendedClient.commands?.get(interaction.commandName);
-
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-    } else {
-      await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
-  }
-});
