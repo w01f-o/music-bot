@@ -1,4 +1,4 @@
-import { Client, Collection, CommandInteraction, Events, Interaction, SlashCommandBuilder } from 'discord.js';
+import { Client, Collection, CommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
 
 export interface ISlashCommand {
   data: SlashCommandBuilder;
@@ -9,8 +9,8 @@ export interface IExtendedClient extends Client<boolean> {
   commands?: Collection<string, ISlashCommand>;
 }
 
-export interface IEvent {
+export interface IEvent<T> {
   name: Events;
   once: boolean;
-  execute: (target: any) => void;
+  execute: (target: T) => void;
 }
