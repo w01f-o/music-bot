@@ -6,7 +6,7 @@
     "rootDir": "./src",
     "resolveJsonModule": true,
     "allowJs": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "./build",
     "removeComments": true,
     "esModuleInterop": true,
