@@ -20,8 +20,9 @@ const clientOptions: ClientOptions = {
 const client: IExtendedClient = new Client(clientOptions);
 
 // Set commands in client and deploy commands
+client.commands = new Collection();
+
 await getCommandsFiles((command: ISlashCommand) => {
-  client.commands = new Collection();
   client.commands?.set(command.data.name, command);
 });
 

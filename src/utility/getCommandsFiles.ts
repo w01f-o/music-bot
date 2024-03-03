@@ -3,10 +3,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const getCommandsFiles = async (callback: Function) => {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
 
-  const foldersPath = path.join(__dirname, '..', 'commands');
-  const commandFolders = fs.readdirSync(foldersPath);
+  const foldersPath: string = path.join(__dirname, '..', 'commands');
+  const commandFolders: string[] = fs.readdirSync(foldersPath);
 
   for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
