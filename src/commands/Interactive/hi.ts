@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { ISlashCommand } from '../types/types.js';
+import { ISlashCommand } from '../../types/types.js';
 
 const command: ISlashCommand = {
   data: new SlashCommandBuilder().setName('hi').setDescription('Hi'),

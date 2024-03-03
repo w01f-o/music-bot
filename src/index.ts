@@ -13,7 +13,7 @@ import colors from 'colors';
 
 colors.enable();
 
-// Create client
+// Create the client
 const clientOptions: ClientOptions = {
   intents: [GatewayIntentBits.Guilds]
 };
@@ -24,7 +24,6 @@ await getCommandsFiles((command: ISlashCommand) => {
   client.commands = new Collection();
   client.commands?.set(command.data.name, command);
 });
-console.log(client.commands);
 
 await deployCommands();
 
