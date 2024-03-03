@@ -10,14 +10,19 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import colors from 'colors';
+import { Player } from 'discord-player';
 
 colors.enable();
 
 // Create the client
 const clientOptions: ClientOptions = {
-  intents: [GatewayIntentBits.Guilds]
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates]
 };
 const client: IExtendedClient = new Client(clientOptions);
+
+// Create the player
+const player: Player = new Player(client);
+await player.extractors.loadDefault();
 
 // Set commands in client and deploy commands
 client.commands = new Collection();
@@ -37,6 +42,7 @@ const eventFiles = fs.readdirSync(eventsPath);
 for (const file of eventFiles) {
   const filePath = `./events/${file}`;
   const { default: event } = await import(filePath);
+
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
   } else {

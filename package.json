@@ -27,5 +27,11 @@
     "rimraf": "^5.0.5",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@discord-player/extractor": "^4.4.6",
+    "discord-player": "^6.6.7",
+    "mediaplex": "^0.0.9",
+    "youtube-ext": "^1.1.16"
   }
 }

@@ -1,10 +1,18 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { ISlashCommand } from '../../types/types.js';
+import { SlashCommandBuilder, CommandInteraction, SlashCommandUserOption, User } from 'discord.js';
 
-const command: ISlashCommand = {
-  data: new SlashCommandBuilder().setName('hi').setDescription('Hi'),
+const commandBuilder = new SlashCommandBuilder()
+  .setName('hi')
+  .setDescription('Hi')
+  .addUserOption((option: SlashCommandUserOption) =>
+    option.setName('user').setDescription('Выбери чорта').setRequired(false)
+  );
+
+const command = {
+  data: commandBuilder,
   async execute(interaction: CommandInteraction) {
-    await interaction.reply(`${interaction.user}, ебать ты чёрт`);
+    const targetUser: User | null = interaction.options.getUser('user');
+
+    await interaction.reply(`${targetUser || interaction.user}, ебать ты чорт`);
   }
 };
 
