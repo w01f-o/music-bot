@@ -33,7 +33,7 @@ const command = {
     const optionTrack: CommandInteractionOption | null = interaction.options.get('track');
 
     player.events.once('playerStart', (queue, track) => {
-      queue.metadata.channel.send({ embeds: [trackEmbed(track)] });
+      queue.metadata.channel.send({ embeds: [trackEmbed(track, interaction)] });
     });
 
     player.events.on('playerError', (queue, e, track) => {
@@ -55,7 +55,7 @@ const command = {
 
       // const queue = useQueue(interaction.guild?.id as string);
       // queue?.node.setBitrate('auto');
-      return interaction.followUp({ embeds: [queueEmbed(track)] });
+      return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
     } catch (e: any) {
       console.error(e);
       return interaction.followUp({ embeds: [errorEmbed(`${e}`)] });
