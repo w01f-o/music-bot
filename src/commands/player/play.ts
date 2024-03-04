@@ -4,16 +4,37 @@ import {
   GuildMember,
   VoiceChannel,
   SlashCommandStringOption,
-  CommandInteractionOption
+  CommandInteractionOption,
+  SlashCommandSubcommandBuilder
 } from 'discord.js';
 import { errorEmbed, queueEmbed, trackEmbed } from '../../utility/embeds.js';
-import { Player, useMainPlayer } from 'discord-player';
+import { Player, PlayerNodeInitializerOptions, QueryType, useMainPlayer } from 'discord-player';
+import getLocalTracks from '../../utility/getLocalTracks.js';
 
 const commandBuilder = new SlashCommandBuilder()
   .setName('play')
-  .setDescription('Play')
-  .addStringOption((option: SlashCommandStringOption) =>
-    option.setName('track').setDescription('track').setRequired(true)
+  .setDescription('Запустить трек')
+  .addSubcommand((subcomand: SlashCommandSubcommandBuilder) =>
+    subcomand
+      .setName('local')
+      .setDescription('Наши треки')
+      .addStringOption((option: SlashCommandStringOption) =>
+        option
+          .setName('track')
+          .setDescription('Трек')
+          .addChoices(...getLocalTracks())
+          .setRequired(true)
+      )
+  )
+  .addSubcommand((subcomand: SlashCommandSubcommandBuilder) =>
+    subcomand
+      .setName('url')
+      .setDescription(
+        'Треки по ссылке (Youtube, Apple music, Spotify, SoundCloud, Яндекс музыка (NW) или текстовый запрос)'
+      )
+      .addStringOption((option: SlashCommandStringOption) =>
+        option.setName('url').setDescription('Ссылка или запрос').setRequired(true)
+      )
   );
 
 const command = {
@@ -30,7 +51,8 @@ const command = {
     const player: Player = useMainPlayer();
 
     await interaction.deferReply();
-    const optionTrack: CommandInteractionOption | null = interaction.options.get('track');
+    const requestTrack: CommandInteractionOption | null =
+      interaction.options.get('url') ?? interaction.options.get('track');
 
     player.events.once('playerStart', (queue, track) => {
       queue.metadata.channel.send({ embeds: [trackEmbed(track, interaction)] });
@@ -45,17 +67,28 @@ const command = {
     });
 
     try {
-      const { track } = await player.play(voiceChannel, optionTrack?.value as string, {
-        nodeOptions: {
-          metadata: interaction,
-          leaveOnEmpty: true,
-          leaveOnEmptyCooldown: 30000
-        }
-      });
+      if (interaction.options.get('track')) {
+        const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
+          nodeOptions: {
+            metadata: interaction,
+            leaveOnEmpty: true,
+            leaveOnEmptyCooldown: 30000
+          },
+          searchEngine: QueryType.FILE
+        });
 
-      // const queue = useQueue(interaction.guild?.id as string);
-      // queue?.node.setBitrate('auto');
-      return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
+        return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
+      } else if (interaction.options.get('url')) {
+        const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
+          nodeOptions: {
+            metadata: interaction,
+            leaveOnEmpty: true,
+            leaveOnEmptyCooldown: 30000
+          }
+        });
+
+        return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
+      }
     } catch (e: any) {
       console.error(e);
       return interaction.followUp({ embeds: [errorEmbed(`${e}`)] });

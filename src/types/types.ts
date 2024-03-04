@@ -14,3 +14,8 @@ export interface IEvent<T> {
   once: boolean;
   execute: (target: T) => void;
 }
+
+export interface ILocalTrack {
+  name: string;
+  value: string;
+}
