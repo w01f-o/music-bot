@@ -11,6 +11,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import colors from 'colors';
 import { Player } from 'discord-player';
+// import { YandexMusicExtractor } from 'discord-player-yandexmusic';
 
 colors.enable();
 
@@ -29,7 +30,12 @@ const player: Player = new Player(client, {
     highWaterMark: 1 << 25
   }
 });
+
 await player.extractors.loadDefault();
+// await player.extractors.register(YandexMusicExtractor, {
+//   access_token: 'y0_AgAAAAAnZi0pAAG8XgAAAAD9BcO5AADdq9YHoTlKvYEvXvXQYRUTL_QnlQ',
+//   uid: '661007657'
+// });
 
 // Set commands in client and deploy commands
 client.commands = new Collection();
