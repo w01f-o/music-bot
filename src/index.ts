@@ -21,7 +21,14 @@ const clientOptions: ClientOptions = {
 const client: IExtendedClient = new Client(clientOptions);
 
 // Create the player
-const player: Player = new Player(client);
+const player: Player = new Player(client, {
+  skipFFmpeg: false,
+  ytdlOptions: {
+    quality: 'highestaudio',
+    filter: 'audioonly',
+    highWaterMark: 1 << 25
+  }
+});
 await player.extractors.loadDefault();
 
 // Set commands in client and deploy commands

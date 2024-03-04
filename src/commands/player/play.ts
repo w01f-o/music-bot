@@ -3,12 +3,11 @@ import {
   CommandInteraction,
   GuildMember,
   VoiceChannel,
-  SlashCommandSubcommandBuilder,
   SlashCommandStringOption,
   CommandInteractionOption
 } from 'discord.js';
 import { errorEmbed, queueEmbed, trackEmbed } from '../../utility/embeds.js';
-import { Player, Track, useMainPlayer } from 'discord-player';
+import { Player, useMainPlayer } from 'discord-player';
 
 const commandBuilder = new SlashCommandBuilder()
   .setName('play')
@@ -33,18 +32,29 @@ const command = {
     await interaction.deferReply();
     const optionTrack: CommandInteractionOption | null = interaction.options.get('track');
 
-    player.events.on('playerStart', (queue, track) => {
+    player.events.once('playerStart', (queue, track) => {
       queue.metadata.channel.send({ embeds: [trackEmbed(track)] });
+    });
+
+    player.events.on('playerError', (queue, e, track) => {
+      console.error(e);
+    });
+
+    player.events.on('error', (queue, e) => {
+      console.error(e);
     });
 
     try {
       const { track } = await player.play(voiceChannel, optionTrack?.value as string, {
         nodeOptions: {
-          metadata: interaction
+          metadata: interaction,
+          leaveOnEmpty: true,
+          leaveOnEmptyCooldown: 30000
         }
       });
-      // console.log(track);
 
+      // const queue = useQueue(interaction.guild?.id as string);
+      // queue?.node.setBitrate('auto');
       return interaction.followUp({ embeds: [queueEmbed(track)] });
     } catch (e: any) {
       console.error(e);
