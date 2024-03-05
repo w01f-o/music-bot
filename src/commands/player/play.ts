@@ -7,8 +7,8 @@ import {
   CommandInteractionOption,
   SlashCommandSubcommandBuilder
 } from 'discord.js';
-import { errorEmbed, queueEmbed, trackEmbed } from '../../utility/embeds.js';
-import { Player, PlayerNodeInitializerOptions, QueryType, useMainPlayer } from 'discord-player';
+import { errorEmbed, infoEmbed, queueEmbed } from '../../utility/embeds.js';
+import { Player, QueryType, useMainPlayer } from 'discord-player';
 import getLocalTracks from '../../utility/getLocalTracks.js';
 
 const commandBuilder = new SlashCommandBuilder()
@@ -45,50 +45,27 @@ const command = {
 
     if (!voiceChannel)
       return await interaction.reply({
-        embeds: [errorEmbed('Вы должны находиться в голосовом канале, чтобы я смог к вам зайти')]
+        embeds: [infoEmbed('Вы должны находиться в голосовом канале, чтобы я смог к вам зайти')]
       });
 
     const player: Player = useMainPlayer();
 
     await interaction.deferReply();
+
     const requestTrack: CommandInteractionOption | null =
       interaction.options.get('url') ?? interaction.options.get('track');
 
-    player.events.once('playerStart', (queue, track) => {
-      queue.metadata.channel.send({ embeds: [trackEmbed(track, interaction)] });
-    });
-
-    player.events.on('playerError', (queue, e, track) => {
-      console.error(e);
-    });
-
-    player.events.on('error', (queue, e) => {
-      console.error(e);
-    });
-
     try {
-      if (interaction.options.get('track')) {
-        const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
-          nodeOptions: {
-            metadata: interaction,
-            leaveOnEmpty: true,
-            leaveOnEmptyCooldown: 30000
-          },
-          searchEngine: QueryType.FILE
-        });
+      const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
+        nodeOptions: {
+          metadata: interaction,
+          leaveOnEmpty: true,
+          leaveOnEmptyCooldown: 30000
+        },
+        searchEngine: interaction.options.get('track') ? QueryType.FILE : QueryType.AUTO
+      });
 
-        return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
-      } else if (interaction.options.get('url')) {
-        const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
-          nodeOptions: {
-            metadata: interaction,
-            leaveOnEmpty: true,
-            leaveOnEmptyCooldown: 30000
-          }
-        });
-
-        return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
-      }
+      return interaction.followUp({ embeds: [queueEmbed(track, interaction)] });
     } catch (e: any) {
       console.error(e);
       return interaction.followUp({ embeds: [errorEmbed(`${e}`)] });

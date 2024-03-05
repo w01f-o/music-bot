@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Collection, ClientOptions } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, ClientOptions, TextChannel } from 'discord.js';
 
 import config from './config.js';
 import { IExtendedClient, ISlashCommand } from './types/types.js';
@@ -10,7 +10,8 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import colors from 'colors';
-import { Player } from 'discord-player';
+import { GuildQueue, Player, Track } from 'discord-player';
+import { trackEmbed } from './utility/embeds.js';
 // import { YandexMusicExtractor } from 'discord-player-yandexmusic';
 
 colors.enable();
@@ -62,6 +63,21 @@ for (const file of eventFiles) {
     client.on(event.name, (...args) => event.execute(...args));
   }
 }
+
+player.events.on('playerStart', async (queue: GuildQueue<any>, track: Track<unknown>) => {
+  const textChannel = queue.metadata?.channel as TextChannel;
+  await textChannel.send({
+    embeds: [trackEmbed(track)]
+  });
+});
+
+player.events.on('playerError', (queue, e) => {
+  console.error(e);
+});
+
+player.events.on('error', (queue, e) => {
+  console.error(e);
+});
 
 // Start the bot
 client.login(config.botToken);
