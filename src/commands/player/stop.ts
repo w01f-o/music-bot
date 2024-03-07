@@ -2,7 +2,7 @@ import { useQueue } from 'discord-player';
 import { SlashCommandBuilder, CommandInteraction, Guild } from 'discord.js';
 import { infoEmbed } from '../../utility/embeds.js';
 
-const commandBuilder = new SlashCommandBuilder().setName('stop').setDescription('Очистить очередь');
+const commandBuilder = new SlashCommandBuilder().setName('stop').setDescription('Выгнать бота');
 
 const command = {
   data: commandBuilder,
@@ -13,7 +13,7 @@ const command = {
 
     queue?.delete();
 
-    await interaction.followUp({ embeds: [infoEmbed('Очередь очищена!')] });
+    await interaction.followUp({ embeds: [infoEmbed('Бот вышел')] });
   }
 };
 
