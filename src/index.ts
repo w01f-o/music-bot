@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Collection, ClientOptions, TextChannel } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, ClientOptions } from 'discord.js';
 
 import config from './config.js';
 import { IExtendedClient, ISlashCommand } from './types/types.js';
@@ -10,9 +10,8 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import colors from 'colors';
-import { GuildQueue, Player, Track } from 'discord-player';
-import { trackEmbed } from './utility/embeds.js';
-// import { YandexMusicExtractor } from 'discord-player-yandexmusic';
+import { Player } from 'discord-player';
+import playerEvents from './events/player/playerEvents.js';
 
 colors.enable();
 
@@ -33,10 +32,6 @@ const player: Player = new Player(client, {
 });
 
 await player.extractors.loadDefault();
-// await player.extractors.register(YandexMusicExtractor, {
-//   access_token: 'y0_AgAAAAAnZi0pAAG8XgAAAAD9BcO5AADdq9YHoTlKvYEvXvXQYRUTL_QnlQ',
-//   uid: '661007657'
-// });
 
 // Set commands in client and deploy commands
 client.commands = new Collection();
@@ -50,11 +45,11 @@ await deployCommands();
 // Event handling
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath);
+const clientEventsPath = path.join(__dirname, 'events', 'client');
+const clientEventFiles = fs.readdirSync(clientEventsPath);
 
-for (const file of eventFiles) {
-  const filePath = `./events/${file}`;
+for (const file of clientEventFiles) {
+  const filePath = `./events/client/${file}`;
   const { default: event } = await import(filePath);
 
   if (event.once) {
@@ -64,20 +59,7 @@ for (const file of eventFiles) {
   }
 }
 
-player.events.on('playerStart', async (queue: GuildQueue<any>, track: Track<unknown>) => {
-  const textChannel = queue.metadata?.channel as TextChannel;
-  await textChannel.send({
-    embeds: [trackEmbed(track)]
-  });
-});
-
-player.events.on('playerError', (queue, e) => {
-  console.error(e);
-});
-
-player.events.on('error', (queue, e) => {
-  console.error(e);
-});
+playerEvents();
 
 // Start the bot
 client.login(config.botToken);

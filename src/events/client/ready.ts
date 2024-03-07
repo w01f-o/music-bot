@@ -1,5 +1,5 @@
 import { Client, Events } from 'discord.js';
-import { IEvent } from '../types/types.js';
+import { IEvent } from '../../types/types.js';
 
 const event: IEvent<Client<true>> = {
   name: Events.ClientReady,

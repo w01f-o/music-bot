@@ -10,8 +10,8 @@ const getLocalTracks = (): ILocalTrack[] => {
 
   return tracksFiles.map(
     (file: string): ILocalTrack => ({
-      name: `${file.replace(/\.[^/.]+$/, '')}`,
-      value: `${path.join(tracksPath, file)}`
+      name: file.replace(/\.[^/.]+$/, ''),
+      value: path.join(tracksPath, file)
     })
   );
 };

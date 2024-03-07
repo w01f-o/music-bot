@@ -29,9 +29,7 @@ const commandBuilder = new SlashCommandBuilder()
   .addSubcommand((subcomand: SlashCommandSubcommandBuilder) =>
     subcomand
       .setName('url')
-      .setDescription(
-        'Треки по ссылке (Youtube, Apple music, Spotify, SoundCloud, Яндекс музыка (NW) или текстовый запрос)'
-      )
+      .setDescription('Треки по ссылке (Youtube, Apple music, Spotify, SoundCloud или текстовый запрос)')
       .addStringOption((option: SlashCommandStringOption) =>
         option.setName('url').setDescription('Ссылка или запрос').setRequired(true)
       )
@@ -60,7 +58,9 @@ const command = {
         nodeOptions: {
           metadata: interaction,
           leaveOnEmpty: true,
-          leaveOnEmptyCooldown: 30000
+          leaveOnEmptyCooldown: 120000,
+          leaveOnEnd: true,
+          leaveOnEndCooldown: 120000
         },
         searchEngine: interaction.options.get('track') ? QueryType.FILE : QueryType.AUTO
       });

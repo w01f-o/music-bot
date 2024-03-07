@@ -1,8 +1,5 @@
 import { Events, CommandInteraction } from 'discord.js';
-import { IEvent, IExtendedClient } from '../types/types.js';
-import colors from 'colors';
-
-colors.enable();
+import { IEvent, IExtendedClient } from '../../types/types.js';
 
 const event: IEvent<CommandInteraction> = {
   name: Events.InteractionCreate,
