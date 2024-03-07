@@ -5,7 +5,7 @@ import { ILocalTrack } from '../types/types.js';
 
 const getLocalTracks = (): ILocalTrack[] => {
   const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
-  const tracksPath: string = path.join(__dirname, '..', 'audio');
+  const tracksPath: string = path.join(__dirname, '..', '..', 'audio');
   const tracksFiles: string[] = fs.readdirSync(tracksPath);
 
   return tracksFiles.map(
