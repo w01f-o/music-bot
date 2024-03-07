@@ -2,20 +2,20 @@ import { GuildQueue, Track, useQueue } from 'discord-player';
 import { CommandInteraction, EmbedAuthorOptions, EmbedBuilder } from 'discord.js';
 
 const author: EmbedAuthorOptions = {
-  name: 'Beat Brewer',
-  iconURL: 'https://i.imgur.com/1tfsB88.png'
+  name: 'Smokeen Lox',
+  iconURL: 'https://i.imgur.com/JKdUkhO.jpg'
 };
 
 export const errorEmbed = (error: string): EmbedBuilder =>
   new EmbedBuilder().setColor(0xe32636).setTitle('Произошла ошибка😓').setDescription(error);
 
-export const trackEmbed = (track: Track<unknown>, interaction?: CommandInteraction): EmbedBuilder =>
+export const trackEmbed = (track: Track<unknown>): EmbedBuilder =>
   new EmbedBuilder()
     .setColor(0x6ea2d5)
     .setTitle('Сейчас играет: ')
     .setDescription(
       `${track.source !== 'arbitrary' ? track.toHyperlink() : track.title.replace(/\.[^/.]+$/, '')}\n\n⏲Длительность: ${track.duration}`
-    ) //\n👀Трек поставил: ${interaction.user}
+    )
     .setAuthor(author)
     .setThumbnail(track.source === 'youtube' ? null : track.thumbnail)
     .setImage(track.source === 'youtube' ? track.thumbnail : null);
