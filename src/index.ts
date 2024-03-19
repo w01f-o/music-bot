@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import colors from 'colors';
 import { Player } from 'discord-player';
 import playerEvents from './events/player/playerEvents.js';
+import { startApi } from './api/api.js';
 
 colors.enable();
 
@@ -60,6 +61,7 @@ for (const file of clientEventFiles) {
 }
 
 playerEvents();
+startApi();
 
 // Start the bot
 client.login(config.botToken);
