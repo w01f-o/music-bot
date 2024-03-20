@@ -10,13 +10,13 @@ class Track {
   name: string;
   author: string;
   id: number;
-  url: string;
+  urlIndex: number;
 
-  constructor(name: string, author: string, url: string) {
+  constructor(name: string, author: string, urlIndex: number) {
     this.name = name;
     this.author = author;
-    this.id = Math.round(Math.random() * 10000);
-    this.url = url;
+    this.id = name === 'Love is' ? 4534 : Math.round(Math.random() * 10000);
+    this.urlIndex = urlIndex;
   }
 }
 
@@ -35,9 +35,10 @@ export const startApi = () => {
   const tracks: Track[] = tracksFiles.map(
     (track: string, index: number) =>
       new Track(
-        track.split(' - ')[0],
         track.split(' - ')[1].replace(/\.[^/.]+$/, ''),
-        `http://localhost:8000/api/tracks/${index}.mp3`
+        track.split(' - ')[0],
+
+        index
       )
   );
 
@@ -50,7 +51,7 @@ export const startApi = () => {
     res.json({ tracks: tracks });
   });
 
-  const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 8000;
+  const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 8222;
 
   app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
 };
