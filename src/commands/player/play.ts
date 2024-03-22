@@ -16,24 +16,43 @@ const commandBuilder = new SlashCommandBuilder()
   .setDescription('Запустить трек')
   .addSubcommand((subcomand: SlashCommandSubcommandBuilder) =>
     subcomand
-      .setName('local')
-      .setDescription('Наши треки')
-      .addStringOption((option: SlashCommandStringOption) =>
-        option
-          .setName('track')
-          .setDescription('Трек')
-          .addChoices(...getLocalTracks())
-          .setRequired(true)
-      )
-  )
-  .addSubcommand((subcomand: SlashCommandSubcommandBuilder) =>
-    subcomand
       .setName('url')
       .setDescription('Треки по ссылке (Youtube, Apple music, Spotify, SoundCloud или текстовый запрос)')
       .addStringOption((option: SlashCommandStringOption) =>
         option.setName('url').setDescription('Ссылка или запрос').setRequired(true)
       )
   );
+
+if (getLocalTracks().length <= 25) {
+  commandBuilder.addSubcommand((subcommand) =>
+    subcommand
+      .setName('local')
+      .setDescription('Наши треки')
+      .addStringOption((option) =>
+        option
+          .setName('track')
+          .setDescription('Трек')
+          .addChoices(...getLocalTracks())
+          .setRequired(true)
+      )
+  );
+} else {
+  for (let i = 0; i < getLocalTracks().length; i += 25) {
+    const trackSubset = getLocalTracks().slice(i, i + 25);
+    commandBuilder.addSubcommand((subcommand) =>
+      subcommand
+        .setName(`local_page-${i / 25 + 1}`)
+        .setDescription('Наши треки')
+        .addStringOption((option) =>
+          option
+            .setName('track')
+            .setDescription('Трек')
+            .addChoices(...trackSubset)
+            .setRequired(true)
+        )
+    );
+  }
+}
 
 const command = {
   data: commandBuilder,
@@ -53,6 +72,7 @@ const command = {
     const requestTrack: CommandInteractionOption | null =
       interaction.options.get('url') ?? interaction.options.get('track');
 
+    // console.log(commandBuilder.options[0] as SlashCommandSubcommandBuilder);
     try {
       const { track } = await player.play(voiceChannel, requestTrack?.value as string, {
         nodeOptions: {
