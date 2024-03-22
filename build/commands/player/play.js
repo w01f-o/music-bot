@@ -6,17 +6,32 @@ const commandBuilder = new SlashCommandBuilder()
     .setName('play')
     .setDescription('Запустить трек')
     .addSubcommand((subcomand) => subcomand
-    .setName('local')
-    .setDescription('Наши треки')
-    .addStringOption((option) => option
-    .setName('track')
-    .setDescription('Трек')
-    .addChoices(...getLocalTracks())
-    .setRequired(true)))
-    .addSubcommand((subcomand) => subcomand
     .setName('url')
     .setDescription('Треки по ссылке (Youtube, Apple music, Spotify, SoundCloud или текстовый запрос)')
     .addStringOption((option) => option.setName('url').setDescription('Ссылка или запрос').setRequired(true)));
+if (getLocalTracks().length <= 25) {
+    commandBuilder.addSubcommand((subcommand) => subcommand
+        .setName('local')
+        .setDescription('Наши треки')
+        .addStringOption((option) => option
+        .setName('track')
+        .setDescription('Трек')
+        .addChoices(...getLocalTracks())
+        .setRequired(true)));
+}
+else {
+    for (let i = 0; i < getLocalTracks().length; i += 25) {
+        const trackSubset = getLocalTracks().slice(i, i + 25);
+        commandBuilder.addSubcommand((subcommand) => subcommand
+            .setName(`local_page-${i / 25 + 1}`)
+            .setDescription('Наши треки')
+            .addStringOption((option) => option
+            .setName('track')
+            .setDescription('Трек')
+            .addChoices(...trackSubset)
+            .setRequired(true)));
+    }
+}
 const command = {
     data: commandBuilder,
     async execute(interaction) {
