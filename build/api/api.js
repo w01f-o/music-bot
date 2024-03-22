@@ -30,5 +30,5 @@ export const startApi = () => {
         res.json({ tracks: tracks });
     });
     const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8222;
-    app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
+    app.listen(PORT, () => console.log(`API Server running on port ${PORT}`.yellow.bold));
 };
